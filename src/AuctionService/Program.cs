@@ -16,4 +16,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Seed data to the database before the application start running
+try
+{
+    DbInitializer.InitDb(app);
+}
+catch (Exception e)
+{
+    Console.WriteLine(e);
+}
+
 app.Run();
