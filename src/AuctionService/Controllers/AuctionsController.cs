@@ -1,5 +1,6 @@
 using AuctionService.Data;
 using AuctionService.DTOs;
+using AuctionService.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,8 +53,24 @@ namespace AuctionService.Controllers
            catch (Exception ex)
            {
                 Console.WriteLine("Failed to fetch all auctions from the database");
-                return StatusCode(400, "A bad request was made");
+                return StatusCode(400, ex);
            }
+        }
+        [HttpPost]
+        public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto auctionDto)
+        {
+            // Map the CreateAuctionDto into Auction Entity
+            var auction = _mapper.Map<Auction>(auctionDto);
+            // TODO: add current user as seller
+            auction.Seller = "test";
+            _context.Auctions.Add(auction);
+            // if return 0, mean noting was saved in the database
+            var result = await _context.SaveChangesAsync() > 0;
+            if (!result) return BadRequest("Could not save changes to the DB");
+            return CreatedAtAction(
+                nameof(GetAuctionById), 
+                new {auction.Id}, 
+                _mapper.Map<AuctionDto>(auction));
         }
     }
 }
