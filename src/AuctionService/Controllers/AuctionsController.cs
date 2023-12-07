@@ -72,5 +72,25 @@ namespace AuctionService.Controllers
                 new {auction.Id}, 
                 _mapper.Map<AuctionDto>(auction));
         }
+        [HttpPut("{id}")]
+        public async Task<ActionResult> updateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
+        {
+            // Get the auction based on the client's request 
+            var auction = await _context.Auctions
+                 // Specifies related entities to include in the query results. 
+                .Include(x => x.Item)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (auction == null) return NotFound();
+            // TODO: check seller == username
+            // Updated the auction (manually instead of automapper)
+            auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
+            auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
+            auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
+            auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
+            auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+            var result = await _context.SaveChangesAsync() > 0;
+            if (result) return Ok();
+            return BadRequest("Could not save changes to the DB");
+        }
     }
 }
