@@ -9,7 +9,7 @@ namespace SearchService.Controllers
     [Route("api/search")]
     public class SearchController: ControllerBase
     {
-        [HttpGet]
+        [HttpGet("searchTerm")]
         public async Task<ActionResult<List<Item>>> SearchItem(string searchTerm)
         {
             // Retrieving Entities: Retrieving data
