@@ -20,6 +20,13 @@ builder.Services.AddMassTransit(x =>
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
     x.UsingRabbitMq((context, cfg) => 
     {
+        // tells MassTransit to listen for messages on a specific queue and to use a particular consumer 
+        // to process those messages, with a defined retry policy in case of failures
+        cfg.ReceiveEndpoint("search-auction-created", e => 
+        {
+            e.UseMessageRetry(r => r.Interval(5,5));
+            e.ConfigureConsumer<AuctionCreatedConsumer>(context);
+        });
         cfg.ConfigureEndpoints(registration: context);
     });
 });
