@@ -18,6 +18,8 @@ namespace AuctionService.RequestHelpers
             CreateMap<CreateAuctionDto, Item>();
             // To publish the createdAuction, we first need to map to AuctionCreated object
             CreateMap<AuctionDto, AuctionCreated>();
+            CreateMap<Auction, AuctionUpdated>().IncludeMembers(a => a.Item);
+            CreateMap<Item, AuctionUpdated>();
         }   
     }
-}
+} 

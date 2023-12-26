@@ -12,6 +12,7 @@ namespace SearchService.RequestHelpers
             // Creates a mapping configuration from the 
             // TSource type to the TDestination type
             CreateMap<AuctionCreated, Item>();
+            CreateMap<AuctionUpdated, Item>();
         }
     }
 }

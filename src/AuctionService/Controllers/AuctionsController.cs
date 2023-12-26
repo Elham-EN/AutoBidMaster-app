@@ -101,6 +101,7 @@ namespace AuctionService.Controllers
             auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
             auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
             auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+            await _publishEndpoint.Publish(_mapper.Map<AuctionUpdated>(auction));
             var result = await _context.SaveChangesAsync() > 0;
             if (result) return Ok();
             return BadRequest("Could not save changes to the DB");
@@ -112,6 +113,8 @@ namespace AuctionService.Controllers
             if (auction == null) return NotFound();
             // TODO: check seller == username
             _context.Auctions.Remove(auction);
+            // Pass id to the auction deleted
+            await _publishEndpoint.Publish<AuctionDeleted>(new {Id = auction.Id.ToString()});
             var result = await _context.SaveChangesAsync() > 0;
             if (!result) return BadRequest("Could not update DB");
             return Ok();
