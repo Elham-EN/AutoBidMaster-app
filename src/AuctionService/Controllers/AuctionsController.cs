@@ -72,14 +72,13 @@ namespace AuctionService.Controllers
             var auction = _mapper.Map<Auction>(auctionDto);
             // TODO: add current user as seller
             auction.Seller = "test";
+            //  new created auction is inserted to postgresql database
             _context.Auctions.Add(auction);
-            // if return 0, mean noting was saved in the database
-            var result = await _context.SaveChangesAsync() > 0;
-
             // publish a message (AuctionCreated) to all subscribed consumers for the message
             var newAuction = _mapper.Map<AuctionDto>(auction);
             await _publishEndpoint.Publish(_mapper.Map<AuctionCreated>(newAuction));
-
+            // if return 0, mean noting was saved in the database
+            var result = await _context.SaveChangesAsync() > 0;
             if (!result) return BadRequest("Could not save changes to the DB");
             return CreatedAtAction(
                 nameof(GetAuctionById), 
